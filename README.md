@@ -1,25 +1,21 @@
 # DIC - Declerative-Imperative configmanager
 
-i have that vision that i can configure all my apps to behave toghether. if i have a prefered editor i want this editor to be recognized by every atom on my computer.
+so it all started from frustration with nixos
+have a consistent config but it isnt owned by me.
 
-nixos gave me the opartunity. i could just write config and nixos would fill out the blanks.
-but then came the problem of permissions. 
-When nix did my dotfiles they were in the store and i would only get a symlink. so something like zed where i wanted to change the font size was imposible withouth home-manager switch.
-i hate that but i love that.
+i love that i can let nix write the configs for my apps. by that i mean have jinja style like placeholders.
+used it a lot for a consistent theme across all apps.
 
-so this is my idea that i randomly though. its not finished by any mean. i dont know where it will land
+but the issue is the store. if done that way the configs land in store and i cant change them on runtime. so something like font size change becomes imposible without home-manager switch.
 
-## the idea
+also i hate the 7 layers of hell (abstraction of abstraction of abstraction)
+so my idea was. keep the format of configs native - but declerative - but imperative.
 
-the way i was solving the colors problem on my nix machine gave me an idea. i can have a single config of truth.
-in that case a json file where i can write every config imaginable and let python and jinja render the configs.
+## idea
 
-that solves a problem of ownership. i own the configs even though they are rendered by a tool. home-manager can have the templates thats okey i dont care cause the writen configs are in the right places anyway. so i can change the configs on runtime withouth rebuilding my system for font size changes.
+u have a single (or composed) config of truth. 
+json format was chosen cause of the nice middle ground bettween nix and python dict.
 
-the idea as for now look like this
-
-i have a single (or composed) file of truth. 
-example:
 ```
 {
     "theme": {
@@ -32,15 +28,8 @@ example:
 }
 ```
 
-there isnt a validator cause the last thing i want to is another abstraction that expects things their way.
-so its a simple json. also a nix expression can easiliy be turned into json.
-
-with jinja i can write a config in its native language.
-nvim in lua
-bash in ... well bash
-
-and jinja will just replace the parts
-so to configure a global theme i just write a normal config for each app
+so there you can have arbitrary configs. whatever you want how you want.
+and let jinja replace the parts in you configs.
 
 [kitty.conf]
 ```
@@ -59,13 +48,14 @@ local M = {
 }
 ```
 
-and all apps take the values from a single source of truth.
-
-so also further changes becomes easy. like change browser? no problem edit one entry in the json file and thats it all configs that are tracked by dic will use the new browser. as simple as that.
+so then you have a store of configs, written in native config format, only with values placeholders you want to change.
+dic with jinja will render those configs and write them to the right places.
+a cutsom diff engine will check for drifts since the configs written in place will be editable, so runtime changes are still possible.
+the diff engine will ensure what should be kept and what is machiene specific.
 
 ## where its at now
 
-ok so this actually works now, its not just an idea anymore. everything lives under `~/.config/dic`, theres a `state.json` (the source of truth), a `mappings.json` (which bundle owns which paths) and a `templates/` folder with one subfolder per bundle.
+ok so this actually works now. everything lives under `~/.config/dic`, theres a `state.json` (the source of truth), a `mappings.json` (which bundle owns which paths) and a `templates/` folder with one subfolder per bundle.
 
 a bundle is just a name for one app, like `nvim` or `kitty`, and it can point at more then one real path at once. nvim for example needs both `~/.config/nvim` and `~/.local/state/nvim`.
 
