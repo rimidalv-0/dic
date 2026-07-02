@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[project]
+name = "dic"
+version = "0.0.1"
+authors = [
+	{ name = "Vladimir Chaykovskyy", email = "vladimor.chak@gmail.com" },
+]
+description = "Declaratice Imperative configs"
+readme = "README.md"
+dependencies = [
+	"jinja2"
+]
+
+[project.scripts]
+dic = "dic.cli:main"
